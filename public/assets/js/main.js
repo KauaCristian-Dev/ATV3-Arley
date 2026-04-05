@@ -5,44 +5,44 @@ const result = document.getElementById("result");
 const saveButton = document.getElementById("save-user");
 const clearButton = document.getElementById("clear-user");
 
-function showResult(message,type){
-    result.textContent = message;
-    result.className= `result ${type}`;
+function showResult(message, type) {
+  result.textContent = message;
+  result.className = `result ${type}`;
 }
 
-function clearForm(){
-    nameInput.value = "";
-    emailInput.value = "";
+function clearForm() {
+  userName.value = "";
+  userEmail.value = "";
 }
 
-function renderEmptyTable(){
-    usersTableBody.innerHTML = `
+function renderEmptyTable(message) {
+  usersTableBody.innerHTML = `
         <tr>
             <td colspan="3" class="user-table-empty">${message}</td>
         </tr>
     `;
-};
+}
 
-async function deleteUser (id){
-    showResult("Excluindo registro...", "loading")
-    const reponse = await fetch(`/users/${id}`, {method:"DELETE"});
-    if (response.ok) {
-        const users = await response.json();
-        console.log(users);
-        showResult("Usuário excluido com sucesso.", "loading");
-        await loadUsers();
-    } else {
-        showResult("Problemas ao excluir o usuário.", "error");
-    }
+async function deleteUser(id) {
+  showResult("Excluindo registro...", "loading");
+  const response = await fetch(`/users/${id}`, { method: "DELETE" });
+  if (response.ok) {
+    const users = await response.json();
+    console.log(users);
+    showResult("Usuário excluido com sucesso.", "loading");
+    await loadUsers();
+  } else {
+    showResult("Problemas ao excluir o usuário.", "error");
+  }
 }
 
 function renderUsers(users) {
-    if (users.length == 0) {
-        renderEmptyTable("Nenhum usuário cadastrado.");
-    } else {
-        let rowsTemp = "";
-        for (let i = 0; i < users.length; i++){
-            rowsTemp += `
+  if (users.length == 0) {
+    renderEmptyTable("Nenhum usuário cadastrado.");
+  } else {
+    let rowsTemp = "";
+    for (let i = 0; i < users.length; i++) {
+      rowsTemp += `
                 <tr>
                     <td>${users[i].name}</td>
                     <td>${users[i].email}</td>
@@ -57,50 +57,50 @@ function renderUsers(users) {
                     </td>
                 </tr>
             `;
-        }
-        usersTableBody.innerHTML = rowsTemp
     }
+    usersTableBody.innerHTML = rowsTemp;
+  }
 }
 
 async function loadUsers() {
-    const reponse = await fetch("/users");
-    if (response.ok) {
-        const users = await response.json();
-        renderUsers(users);
-    } else {
-        renderEmptyTable("Problemas ao obter os usuários.")
-    }
+  const response = await fetch("/users");
+  if (response.ok) {
+    const users = await response.json();
+    renderUsers(users);
+  } else {
+    renderEmptyTable("Problemas ao obter os usuários.");
+  }
 }
 
-async function createUser(){
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    if(name && email){
+async function createUser() {
+  const name = userName.value.trim();
+  const email = userEmail.value.trim();
+  if (name && email) {
     showResult("Salvando usuários...", "loading");
-    const reponse = await fetch(
-        `/users`, {
-        method:"POST",
-        headers: { "Content-type": "applicatio/json" },
-        body: JSON.stringify({name, email})
+    const response = await fetch(`/users`, {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({ name, email }),
     });
     if (response.ok) {
-        const users = await response.json();
-        clearForm()
-        showResult("Usuário cadastrado com sucesso.", "loading");
-        await loadUsers();
+      const users = await response.json();
+      clearForm();
+      showResult("Usuário cadastrado com sucesso.", "loading");
+      await loadUsers();
     } else {
-        showResult("Problemas ao excluir o usuário.", "error");
+      showResult("Problemas ao excluir o usuário.", "error");
     }
-    } else {
-        showResult("Preencha nome e email para continuar.", "error");
-    }
+  } else {
+    showResult("Preencha nome e email para continuar.", "error");
+  }
 }
 
+
 saveButton.addEventListener("click", function(){
-    console.log("salvar");
-})
+  createUser();
+});
 
 clearButton.addEventListener("click", function(){
-    clearForm("limpar")
-})
+  clearForm();
+});
 loadUsers();
